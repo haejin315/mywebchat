@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>mywebchat</title>
+  <style>
+    html, body {
+      margin: 0;
+      height: 100%;
+      overflow: hidden;
+      background: #0b0d12;
+    }
+
+    /* 드래그 영역(전체 화면) */
+    #stage {
+        position: fixed;
+        inset: 0;
+        user-select: none;
+        cursor: crosshair;
+        touch-action: none; /* pointer 이벤트 안정화 */
+        }
+
+    /* 모든 사각형 공통 */
+    .rect {
+    position: absolute;
+    box-sizing: border-box;
+    border-radius: 6px;
+    overflow:hidden;
+    }
+
+    .rect .editor{
+    width: 100%;
+    height: 100%;
+    outline: none;
+    border: none;
+    background: transparent;
+    color: white;
+
+    /* ✅ 줄바꿈/랩 금지 */
+    white-space: nowrap;
+    overflow: hidden;
+
+    padding: 0 4px;
+    margin: 0;
+    display: flex;
+    align-items: center; /* 수직 가운데 */
+    }
+
+    /* 내 사각형 */
+    .rect.me {
+      position: absolute;
+      border: 2px solid #7cf;
+      background: rgba(120, 200, 255, 0.12);
+      box-sizing: border-box;
+      border-radius: 6px;
+    }
+
+    /* 다른 유저 사각형(예시) */
+    .rect.other {
+      position: absolute;
+      border: 2px solid #f77;
+      background: rgba(255, 120, 120, 0.10);
+      box-sizing: border-box;
+      border-radius: 6px;
+    }
+
+    /* 드래그 프리뷰 */
+    .rect.preview {
+      position: absolute;
+      border: 2px dashed rgba(255,255,255,0.6);
+      background: rgba(255,255,255,0.06);
+      box-sizing: border-box;
+      border-radius: 6px;
+      pointer-events: none;
+    }
+
+    .drop {
+      position: absolute;
+      pointer-events: none;
+      overflow: visible; /* 글자가 아래로 떨어질 때 밖으로 나가도 보이게 */
+    }
+
+    .drop .ch {
+      position: absolute;
+      top: 0;
+      white-space: pre;
+      user-select: none;
+    }
+
+
+    /* 충돌 시 안내 */
+    #toast {
+      position: fixed;
+      left: 50%;
+      bottom: 24px;
+      transform: translateX(-50%);
+      padding: 10px 14px;
+      background: rgba(0,0,0,0.6);
+      color: #fff;
+      border: 1px solid rgba(255,255,255,0.2);
+      border-radius: 10px;
+      font: 14px/1.2 system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+      opacity: 0;
+      transition: opacity 120ms ease;
+      pointer-events: none;
+    }
+    #toast.show { opacity: 1; }
+  </style>
+</head>
+<body>
+  <div id="stage"></div>
+  <div id="toast">겹치면 안 돼서 배치할 수 없어.</div>
+
+  <script src="./app.js"></script>
+</body>
+</html>
