@@ -311,7 +311,7 @@
         el: span,
         y: 0,
         vy: 0,
-        g: 1200 + Math.random() * 600, // 중력(px/s^2)
+        g: 600 + Math.random() * 600, // 중력(px/s^2)
       });
 
       x += widths[i];
