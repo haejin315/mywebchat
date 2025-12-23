@@ -13,7 +13,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-
       - uses: docker/setup-buildx-action@v3
 
       - name: Login to GHCR
@@ -36,50 +35,51 @@ jobs:
       - name: Build & push nginx
         uses: docker/build-push-action@v6
         with:
-          context: ./deploy/nginx
+          context: .
           file: ./deploy/nginx/Dockerfile
           push: true
           tags: |
             ghcr.io/${{ github.repository_owner }}/mywebchat-nginx:latest
             ghcr.io/${{ github.repository_owner }}/mywebchat-nginx:${{ github.sha }}
 
-    deploy_to_ec2:
-      needs: build_and_push
-      runs-on: ubuntu-latest
-      steps:
-        - name: Configure AWS credentials
-          uses: aws-actions/configure-aws-credentials@v4
-          with:
-            aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-            aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-            aws-region: ${{ secrets.AWS_REGION }}
+  deploy_to_ec2:
+    needs: build_and_push
+    runs-on: ubuntu-latest
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
 
-        - name: Deploy via SSM
-          shell: bash
-          run: |
-            set -euo pipefail
+      - name: Deploy via SSM
+        shell: bash
+        run: |
+          set -euo pipefail
 
-            COMMAND_ID=$(aws ssm send-command \
-              --instance-ids "${{ secrets.EC2_INSTANCE_ID }}" \
-              --document-name "AWS-RunShellScript" \
-              --comment "Deploy mywebchat via docker compose" \
-              --parameters commands='[
-                "set -e",
-                "cd /opt/mywebchat",
-                "docker login ghcr.io -u '${{ secrets.GHCR_USER }}' -p '${{ secrets.GHCR_TOKEN }}'",
-                "docker compose pull",
-                "docker compose up -d",
-                "docker image prune -f"
-              ]' \
-              --query "Command.CommandId" --output text)
+          COMMAND_ID=$(aws ssm send-command \
+            --instance-ids "${{ secrets.EC2_INSTANCE_ID }}" \
+            --document-name "AWS-RunShellScript" \
+            --comment "Deploy mywebchat via docker compose" \
+            --parameters commands='[
+              "set -e",
+              "cd /opt/mywebchat",
+              "docker login ghcr.io -u \"${{ secrets.GHCR_USER }}\" -p \"${{ secrets.GHCR_TOKEN }}\"",
+              "docker compose pull",
+              "docker compose up -d",
+              "docker image prune -f"
+            ]' \
+            --query "Command.CommandId" --output text)
 
-            echo "SSM CommandId=$COMMAND_ID"
+          echo "SSM CommandId=$COMMAND_ID"
 
-            aws ssm wait command-executed \
-              --command-id "$COMMAND_ID" \
-              --instance-id "${{ secrets.EC2_INSTANCE_ID }}"
+          aws ssm wait command-executed \
+            --command-id "$COMMAND_ID" \
+            --instance-id "${{ secrets.EC2_INSTANCE_ID }}"
 
-            aws ssm get-command-invocation \
-              --command-id "$COMMAND_ID" \
-              --instance-id "${{ secrets.EC2_INSTANCE_ID }}" \
-              --output text
+          aws ssm get-command-invocation \
+            --command-id "$COMMAND_ID" \
+            --instance-id "${{ secrets.EC2_INSTANCE_ID }}" \
+            --query "{Status:Status,StdOut:StandardOutputContent,StdErr:StandardErrorContent}" \
+            --output text
