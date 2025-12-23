@@ -63,8 +63,6 @@ MyWebChat – CI/CD 기반 배포 자동화 구축 기록
   docker-compose 구조
     EC2에서는 build 없이 image pull만 수행
     로컬/CI에서만 build
-    
-  //////////////////////////////////////////////////
   
   services:
     app:
@@ -75,8 +73,6 @@ MyWebChat – CI/CD 기반 배포 자동화 구축 기록
       ports:
         - "80:80"
         
-  //////////////////////////////////////////////////
-
 5. CI: GitHub Actions (Build & Push)
   동작 트리거
     main 브랜치 push 시 자동 실행
@@ -101,26 +97,17 @@ MyWebChat – CI/CD 기반 배포 자동화 구축 기록
   
   배포 방식
   GitHub Actions에서:
-  
-  //////////////////////////////////////////////////
-  
+    
   aws ssm send-command \
     --document-name AWS-RunShellScript \
     --instance-ids <EC2_ID>
-    
-  //////////////////////////////////////////////////
-  
+      
   EC2 내부에서 실행되는 명령:
-  
-  //////////////////////////////////////////////////
-  
   docker login ghcr.io
   docker compose pull
   docker compose up -d
   docker image prune -f
-  
-  //////////////////////////////////////////////////
-  
+    
   장점
     SSH 완전 제거
     인바운드 규칙: HTTP(80), HTTPS(443)만 허용
