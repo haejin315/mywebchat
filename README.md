@@ -12,7 +12,7 @@ MyWebChat – CI/CD 기반 배포 자동화 구축 기록
   SSH 없는 SSM 기반 배포 자동화
   까지 엔드 투 엔드 배포 파이프라인를 직접 설계·구현한 프로젝트입니다.
 
-2. 전체 아키텍처
+3. 전체 아키텍처
   [ Local 개발 ]
      ↓ git push
   [ GitHub Actions ]
