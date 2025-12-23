@@ -474,7 +474,7 @@ function wireEditor(ed) {
           text,
           x: my.x + 4,
           y: my.y,
-          fontPx: myBaseH
+          fontPx: myBaseH /2
         }
       };
 
