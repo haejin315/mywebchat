@@ -63,7 +63,7 @@ jobs:
             --document-name "AWS-RunShellScript" \
             --comment "Deploy mywebchat via docker compose" \
             --parameters commands='[
-              "set -euxo pipefail",
+              "set -euxo",
               "echo ==== WHOAMI ====",
               "whoami",
               "echo ==== PWD ====",
