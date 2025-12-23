@@ -1,16 +1,14 @@
+# build
 FROM golang:1.22 AS builder
 WORKDIR /src
-
-COPY go.mod go.sum ./
-RUN go mod download
-
 COPY . .
-RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 \
-    go build -o /out/app ./cmd/server
+RUN go mod download
+RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o app .
 
-FROM gcr.io/distroless/base-debian12
+# run
+FROM alpine:3.20
 WORKDIR /app
-COPY --from=builder /out/app /app/app
-
+COPY --from=builder /src/app /app/app
 EXPOSE 8080
-ENTRYPOINT ["/app/app"]
+ENV PORT=8080
+CMD ["/app/app"]

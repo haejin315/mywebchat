@@ -1,6 +1,6 @@
 services:
   app:
-    build: .
+    image: ghcr.io/haejin315/mywebchat-app:latest
     container_name: mywebchat-app
     restart: unless-stopped
     expose:
@@ -9,13 +9,10 @@ services:
       - PORT=8080
 
   nginx:
-    image: nginx:1.27-alpine
+    image: ghcr.io/haejin315/mywebchat-nginx:latest
     container_name: mywebchat-nginx
     restart: unless-stopped
     ports:
       - "80:80"
-    volumes:
-      - ./deploy/nginx/default.conf:/etc/nginx/conf.d/default.conf:ro
-      - ./web/static:/usr/share/nginx/html:ro
     depends_on:
       - app
