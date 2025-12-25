@@ -16,3 +16,5 @@ services:
       - "80:80"
     depends_on:
       - app
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
